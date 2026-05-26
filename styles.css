@@ -64,7 +64,7 @@ body>*:not(.bg-canvas):not(.overlay){position:relative;z-index:1}
   background:linear-gradient(140deg,rgba(2,8,22,0.98) 0%,rgba(4,20,48,0.98) 50%,rgba(2,10,28,0.98) 100%);
   border-bottom:2px solid rgba(232,160,32,0.5);
   position:sticky;top:0;
-  z-index:9000;           /* highest — always on top */
+  z-index:9000;
   backdrop-filter:blur(20px);
   box-shadow:var(--shadow2);
   height:var(--hdr-height);
@@ -107,114 +107,181 @@ body>*:not(.bg-canvas):not(.overlay){position:relative;z-index:1}
 }
 .btn-onboard:hover{filter:brightness(1.12);transform:translateY(-1px)}
 
-/* ─── CODE SELECTOR ──────────────────────────────────────────── */
-/* ─── CODE SELECTOR ──────────────────────────────────────────── */
-.code-selector{
-  position:sticky;
-  top:var(--hdr-height);
-  z-index:8000;
-  background:rgba(4,16,30,0.96);
-  border-bottom:none;
-  backdrop-filter:blur(16px);
-  -webkit-backdrop-filter:blur(16px);
-  overflow:hidden;
-  padding-bottom:1px;
-}
-[data-theme="light"] .code-selector{background:rgba(10,24,60,0.95)}
+/* ─── CODE SELECTOR (FIXED - NO BORDER OVERLAP) ─────────────────*/
+/* ─── CODE SELECTOR (FULLY FIXED - CLEAN BORDERS, NO MIXING) ─────────────────*/
+/* ─── CODE SELECTOR (CLEAN BORDERS - NO MIXING) ─────────────────*/
+/* ─── CODE SELECTOR (CLEAN — NO BACKGROUND MIXING) ────────────────*/
 
-.code-selector-inner{
-  max-width:1800px;
-  margin:0 auto;
-  padding:8px 24px 9px;
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:8px;
+.code-selector {
+  position: sticky;
+  top: var(--hdr-height);
+  z-index: 8000;
+  /* ✅ Solid opaque background — no transparency mixing */
+  background: var(--bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  /* ✅ Remove any borders that cause mixing */
+  border: none;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
 }
 
-.code-btn{
-  background:var(--card);
-  border:2px solid transparent;
-  border-radius:10px;
-  padding:10px 14px 12px;
-  display:flex;
-  flex-direction:column;
-  align-items:flex-start;
-  gap:2px;
-  transition:border-color .18s, background .18s;
-  position:relative;
-  min-height:66px;
-  cursor:pointer;
-  overflow:hidden;
-  isolation:isolate;
-  box-sizing:border-box;
-  width:100%;
-  box-shadow:none;
+[data-theme="light"] .code-selector {
+  background: var(--bg);
+  box-shadow: 0 2px 12px rgba(0, 20, 60, 0.08);
 }
 
-.code-btn::after{
-  content:'';
-  position:absolute;
-  bottom:0;
-  left:0;
-  right:0;
-  height:3px;
-  background:transparent;
-  transition:background .18s;
+.code-selector-inner {
+  max-width: 1800px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  position: relative;
+  /* ✅ No overflow issues */
+  overflow: visible;
 }
 
-.code-btn:hover:not(.active){
-  background:var(--card2);
-  border-color:var(--border2);
+/* ─── INDIVIDUAL BUTTONS — CLEAN, NO MIXING ────────────────────── */
+
+.code-btn {
+  /* ✅ Solid background — no transparency */
+  background: var(--bg2);
+  border: none;
+  
+  /* ✅ Only vertical divider */
+  border-right: 1px solid var(--border);
+  
+  /* ✅ Bottom border for active state only */
+  border-bottom: 3px solid transparent;
+  
+  border-radius: 0;
+  padding: 16px 20px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  width: 100%;
 }
 
-#btn-wages.active{
-  border-color:#E8A020;
-  background:rgba(232,160,32,0.07);
-}
-#btn-wages.active::after{background:#E8A020}
-
-#btn-osh.active{
-  border-color:#1ECDE8;
-  background:rgba(30,205,232,0.07);
-}
-#btn-osh.active::after{background:#1ECDE8}
-
-#btn-ir.active{
-  border-color:#9B72E8;
-  background:rgba(155,114,232,0.07);
-}
-#btn-ir.active::after{background:#9B72E8}
-
-#btn-ss.active{
-  border-color:#2ECC9A;
-  background:rgba(46,204,154,0.07);
-}
-#btn-ss.active::after{background:#2ECC9A}
-
-.code-icon{font-size:18px;line-height:1;margin-bottom:2px}
-
-.code-name{
-  font-size:12px;
-  font-weight:800;
-  color:var(--text);
-  line-height:1.2;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  max-width:100%;
+/* ✅ Last button — no right border */
+.code-btn:last-child {
+  border-right: none;
 }
 
-.code-meta{
-  font-size:9px;
-  color:var(--text3);
-  font-weight:500;
-  font-family:'JetBrains Mono',monospace;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  max-width:100%;
+/* ✅ Hover state — subtle change */
+.code-btn:hover:not(.active) {
+  background: var(--bg3);
 }
 
+/* ─── ACTIVE STATE — Clear colored bottom bar ──────────────────── */
+
+.code-btn.active {
+  /* ✅ Slightly different background for active */
+  background: var(--card);
+  z-index: 2;
+}
+
+/* Wages — Gold */
+#btn-wages.active {
+  border-bottom-color: #E8A020;
+}
+
+/* OSH — Teal */
+#btn-osh.active {
+  border-bottom-color: #1ECDE8;
+}
+
+/* IR — Purple */
+#btn-ir.active {
+  border-bottom-color: #9B72E8;
+}
+
+/* SS — Green */
+#btn-ss.active {
+  border-bottom-color: #2ECC9A;
+}
+
+/* Remove pseudo-element completely */
+.code-btn::after,
+.code-btn::before {
+  display: none;
+}
+
+/* ─── BUTTON CONTENT ───────────────────────────────────────────── */
+
+.code-icon {
+  font-size: 20px;
+  margin-bottom: 2px;
+  line-height: 1;
+  transition: transform 0.2s;
+}
+
+.code-btn:hover .code-icon,
+.code-btn.active .code-icon {
+  transform: scale(1.1);
+}
+
+.code-name {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.code-btn.active .code-name {
+  color: #fff;
+}
+
+.code-meta {
+  font-size: 8px;
+  color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1.3;
+  letter-spacing: 0.3px;
+}
+
+.code-btn.active .code-meta {
+  color: var(--text2);
+}
+
+/* ─── RESPONSIVE — Tablet ─────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  .code-selector-inner {
+    grid-template-columns: 1fr 1fr;
+    padding: 0 16px;
+  }
+  
+  .code-btn {
+    border-right: none;
+    border-bottom: 3px solid transparent;
+  }
+}
+
+/* ─── RESPONSIVE — Mobile ─────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .code-selector-inner {
+    grid-template-columns: 1fr;
+    padding: 0 12px;
+  }
+  
+  .code-btn {
+    border-right: none;
+    border-bottom: 3px solid transparent;
+    padding: 12px 14px 10px;
+  }
+  
+  .code-name {
+    font-size: 11px;
+  }
+}
 
 /* ─── DASHBOARD CONTENT ──────────────────────────────────────── */
 #dashboard-content{animation:slideIn .3s ease;position:relative;z-index:1}

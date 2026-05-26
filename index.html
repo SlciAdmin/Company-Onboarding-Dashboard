@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>4 Labour Codes — Unified Compliance Dashboard 2026</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  
+  <!-- External CSS -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Animated Background -->
+  <div class="bg-canvas" aria-hidden="true">
+    <div class="bg-orb orb1"></div>
+    <div class="bg-orb orb2"></div>
+    <div class="bg-orb orb3"></div>
+    <div class="bg-grid"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="main-hdr">
+    <div class="main-hdr-inner">
+      <div class="main-hdr-logo">
+        <div class="main-hdr-emblem">⚖️</div>
+        <div class="main-hdr-text">
+          <h1>4 Labour Codes — Unified Compliance Dashboard</h1>
+          <p>Ministry of Labour &amp; Employment · Central Rules Notified 8 May 2026 · G.S.R. 341–345(E)</p>
+        </div>
+      </div>
+      <div class="main-hdr-right">
+        <span class="badge bg-gold">Enacted: 2019–2020</span>
+        <span class="badge bg-green">480 Total Sections</span>
+        <span class="badge bg-blue">355 Central Rules</span>
+        <span class="badge bg-teal">82 Prescribed Forms</span>
+        <button class="btn-onboard" onclick="ONBOARD.open()">🏢 Company Onboarding</button>
+        <button class="btn-theme" id="themeBtn" onclick="toggleTheme()">☀️ Light</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Code Selector -->
+  <div class="code-selector">
+    <div class="code-selector-inner">
+      <button class="code-btn active" id="btn-wages" onclick="selectCode('wages',this)">
+        <span class="code-icon">💰</span>
+        <span class="code-name">Code on Wages</span>
+        <span class="code-meta">2019 · Act 29 · 69 Sec · 54 Rules</span>
+      </button>
+      <button class="code-btn" id="btn-osh" onclick="selectCode('osh',this)">
+        <span class="code-icon">🛡️</span>
+        <span class="code-name">OSH&amp;WC Code</span>
+        <span class="code-meta">2020 · Act 37 · 143 Sec · 182 Rules</span>
+      </button>
+      <button class="code-btn" id="btn-ir" onclick="selectCode('ir',this)">
+        <span class="code-icon">🤝</span>
+        <span class="code-name">Industrial Relations</span>
+        <span class="code-meta">2020 · Act 35 · 104 Sec · 50 Rules</span>
+      </button>
+      <button class="code-btn" id="btn-ss" onclick="selectCode('ss',this)">
+        <span class="code-icon">🏦</span>
+        <span class="code-name">Social Security Code</span>
+        <span class="code-meta">2020 · Act 36 · 164 Sec · 69 Rules</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Dashboard Content (Dynamic) -->
+  <div id="dashboard-content"></div>
+
+  <!-- DETAIL MODAL -->
+  <div class="overlay" id="detailOverlay" onclick="handleOverlayClick(event,'detailOverlay')">
+    <div class="modal-scroll-wrap" onclick="handleOverlayClick(event,'detailOverlay')">
+      <div class="modal detail-modal" onclick="event.stopPropagation()">
+        <button class="close-modal-btn" onclick="closeDetailModal()" aria-label="Close">✕</button>
+        <div id="detailContent"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALENDAR MODAL -->
+  <div class="overlay" id="calOverlay" onclick="handleOverlayClick(event,'calOverlay')">
+    <div class="modal-scroll-wrap" onclick="handleOverlayClick(event,'calOverlay')">
+      <div class="modal cal-modal" onclick="event.stopPropagation()">
+        <button class="close-modal-btn" onclick="closeCal()" aria-label="Close">✕</button>
+        <h2>📅 Add to Google Calendar</h2>
+        <p>Select compliance deadlines to add:</p>
+        <div id="calEvs"></div>
+        <div class="mbtns">
+          <button class="btn-c" onclick="closeCal()">Cancel</button>
+          <button class="btn-a" onclick="addCal()">Add Selected</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ONBOARDING MODAL -->
+  <div class="overlay" id="onboardOverlay" onclick="handleOverlayClick(event,'onboardOverlay')">
+    <div class="modal-scroll-wrap" onclick="handleOverlayClick(event,'onboardOverlay')">
+      <div class="modal onboard-modal" onclick="event.stopPropagation()">
+        <button class="close-modal-btn" onclick="ONBOARD.close()" aria-label="Close">✕</button>
+        <div class="ob-progress-wrap">
+          <div class="ob-progress-label" id="obProgressLabel">Step 1 of 3 — Company Details</div>
+          <div class="ob-progress-track"><div class="ob-progress-bar" id="obProgressBar" style="width:33%"></div></div>
+        </div>
+
+        <!-- STEP 1 -->
+        <div id="onboardStep1">
+          <div class="ob-form-title">🏢 Company Onboarding</div>
+          <div class="ob-form-sub">Enter your company details for a personalised compliance report across all 4 Labour Codes.</div>
+          <div class="ob-grid" style="margin-bottom:14px">
+            <div class="ob-field full">
+              <label class="ob-label">Company Name <span class="ob-required">*</span></label>
+              <input id="obCompanyName" class="ob-input" type="text" placeholder="e.g. Acme Manufacturing Pvt. Ltd.">
+            </div>
+            <div class="ob-field">
+              <label class="ob-label">Employee / Contact Name <span class="ob-required">*</span></label>
+              <input id="obEmployeeName" class="ob-input" type="text" placeholder="e.g. Rajesh Kumar">
+            </div>
+            <div class="ob-field">
+              <label class="ob-label">Designation <span class="ob-required">*</span></label>
+              <input id="obDesignation" class="ob-input" type="text" placeholder="e.g. HR Manager">
+            </div>
+            <div class="ob-field">
+              <label class="ob-label">Industry / Sector <span class="ob-required">*</span></label>
+              <select id="obIndustry" class="ob-select">
+                <option value="">— Select Industry —</option>
+                <option value="manufacturing">Manufacturing / Factory</option>
+                <option value="it_services">IT / Software / BPO</option>
+                <option value="construction">Construction / Infrastructure</option>
+                <option value="retail_trade">Retail / Trade / Commerce</option>
+                <option value="hospitality">Hospitality / Hotels</option>
+                <option value="healthcare">Healthcare / Pharma</option>
+                <option value="education">Education / Training</option>
+                <option value="logistics">Logistics / Transport</option>
+                <option value="finance">Finance / Banking</option>
+                <option value="agriculture">Agriculture / Plantation</option>
+                <option value="mining">Mining / Quarrying</option>
+                <option value="media">Media / Entertainment</option>
+                <option value="energy">Energy / Power / Oil &amp; Gas</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="ob-field">
+              <label class="ob-label">Total Employees <span class="ob-required">*</span></label>
+              <input id="obEmployeeCount" class="ob-input" type="number" min="1" placeholder="e.g. 150">
+            </div>
+            <div class="ob-field">
+              <label class="ob-label">Establishment Type <span class="ob-required">*</span></label>
+              <select id="obCompanyType" class="ob-select">
+                <option value="">— Select Type —</option>
+                <option value="factory">Factory / Manufacturing Unit</option>
+                <option value="shop_establishment">Shop / Commercial</option>
+                <option value="construction">Building / Construction</option>
+                <option value="mine">Mine / Quarry</option>
+                <option value="plantation">Plantation</option>
+                <option value="contractor">Contractor / Labour Contractor</option>
+                <option value="aggregator">App-based Aggregator / Gig</option>
+                <option value="ngo_trust">NGO / Trust / Society</option>
+                <option value="startup">Startup / DPIIT Recognised</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="ob-nav">
+            <button class="ob-btn-next" onclick="ONBOARD.goStep2()">Next — Additional Details →</button>
+          </div>
+        </div>
+
+        <!-- STEP 2 -->
+        <div id="onboardStep2" style="display:none">
+          <div class="ob-form-title">📋 Additional Details</div>
+          <div class="ob-form-sub">Provide more details for a precise compliance mapping.</div>
+          <div class="ob-grid" style="margin-bottom:14px">
+            <div class="ob-field">
+              <label class="ob-label">GSTIN (Optional)</label>
+              <input id="obGST" class="ob-input" type="text" placeholder="e.g. 29ABCDE1234F1Z5">
+            </div>
+            <div class="ob-field">
+              <label class="ob-label">Contact Number (Optional)</label>
+              <input id="obContact" class="ob-input" type="tel" placeholder="e.g. 9876543210">
+            </div>
+            <div class="ob-field full">
+              <label class="ob-label">State / UT of Principal Office</label>
+              <select id="obState" class="ob-select">
+                <option value="">— Select State —</option>
+                <option>Andhra Pradesh</option><option>Assam</option><option>Bihar</option>
+                <option>Chhattisgarh</option><option>Delhi (NCT)</option><option>Goa</option>
+                <option>Gujarat</option><option>Haryana</option><option>Himachal Pradesh</option>
+                <option>Jharkhand</option><option>Karnataka</option><option>Kerala</option>
+                <option>Madhya Pradesh</option><option>Maharashtra</option><option>Odisha</option>
+                <option>Punjab</option><option>Rajasthan</option><option>Tamil Nadu</option>
+                <option>Telangana</option><option>Uttar Pradesh</option><option>Uttarakhand</option>
+                <option>West Bengal</option><option>Chandigarh</option><option>Jammu &amp; Kashmir</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-bottom:14px">
+            <label class="ob-label" style="display:block;margin-bottom:8px">Special Categories (select all that apply)</label>
+            <div class="ob-check-group">
+              <label class="ob-check-item"><input type="checkbox" id="obContractLabour"> Contract Labour</label>
+              <label class="ob-check-item"><input type="checkbox" id="obMines"> Mine / Quarry</label>
+              <label class="ob-check-item"><input type="checkbox" id="obConstruction"> Building &amp; Construction</label>
+              <label class="ob-check-item"><input type="checkbox" id="obPlantation"> Plantation Work</label>
+              <label class="ob-check-item"><input type="checkbox" id="obMigrant"> Inter-State Migrants</label>
+              <label class="ob-check-item"><input type="checkbox" id="obBOCW"> BOCW Registered</label>
+            </div>
+          </div>
+          <div class="ob-nav">
+            <button class="ob-btn-back" onclick="ONBOARD.goStep1()">← Back</button>
+            <button class="ob-btn-generate" onclick="ONBOARD.generate()">🔍 Generate Compliance Report</button>
+          </div>
+        </div>
+
+        <!-- STEP 3 RESULTS -->
+        <div id="onboardStep3" style="display:none">
+          <div id="onboardResultsContent"></div>
+          <div class="ob-export-row">
+            <button class="ob-btn-export" onclick="ONBOARD.exportReport()">⬇ Export Report</button>
+            <button class="ob-btn-new" onclick="ONBOARD.resetForm()">🔄 New Company</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ EXTERNAL SCRIPTS — ORDER MATTERS! -->
+  <!-- 1. DATA FILES FIRST (Global Constants) -->
+  <script src="data-wages.js"></script>
+  <script src="data-osh.js"></script>
+  <script src="data-ir.js"></script>
+  <script src="data-ss.js"></script>
+  
+  <!-- 2. APP LOGIC (Uses DATA_* constants) -->
+  <script src="app.js"></script>
+  
+  <!-- 3. ONBOARDING ENGINE (Uses DATA_* constants) -->
+  <script src="onboard.js"></script>
+</body>
+</html>
